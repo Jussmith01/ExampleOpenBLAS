@@ -1,0 +1,31 @@
+# depslib dependency file v1.0
+1439303207 source:/home/jujuman-home/Gits/OpenBLASEigenExample/src/main.cpp
+	<iostream>
+	<cstring>
+	<vector>
+	<lapacke.h>
+	<cblas.h>
+
+1439296042 /usr/local/OpenBLAS/include/lapacke.h
+	"lapacke_config.h"
+	<stdlib.h>
+	<complex.h>
+	<complex.h>
+	"lapacke_mangling.h"
+
+1439296042 /usr/local/OpenBLAS/include/lapacke_config.h
+	<complex>
+	<stdlib.h>
+	<complex.h>
+	<complex.h>
+
+1439296042 /usr/local/OpenBLAS/include/lapacke_mangling.h
+
+1439296042 /usr/local/OpenBLAS/include/cblas.h
+	<stddef.h>
+	"openblas_config.h"
+
+1439296042 /usr/local/OpenBLAS/include/openblas_config.h
+	<stdio.h>
+	<complex.h>
+
