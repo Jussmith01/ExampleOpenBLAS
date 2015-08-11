@@ -31,11 +31,14 @@ int main (int argc,char* argv[])
     /* Move data to the std::vector a*/
     std::memcpy(&a[0],atemp,n*n*sizeof(float));
 
+    /* Make a working vector! */
+    std::vector<float> c(n*n);
+    std::memcpy(&c[0],&a[0],n*n*sizeof(float));
 
     /* -------------------- Eigenvalues with lapack ----------------- */
 
     /* Example of how to use std::vector with ssyev */
-    info = LAPACKE_ssyev( LAPACK_ROW_MAJOR,'V','U',n,&a[0],n,&w[0] );
+    info = LAPACKE_ssyev( LAPACK_ROW_MAJOR,'V','U',n,&c[0],n,&w[0] );
 
     /* Error checking */
     if (info > 0)
@@ -59,30 +62,37 @@ int main (int argc,char* argv[])
     {
         for (int j=0;j<n;++j)
         {
-            std::cout << a[i*n+j] << " ";
+            std::cout << c[i*n+j] << " ";
         }
         std::cout << std::endl;
     }
 
-    /* Make a working vector! */
-    std::vector<float> c(n*n);
-
+    std::memcpy(&c[0],&a[0],n*n*sizeof(float));
 
     /* -------------------- Matrix inverse with Lapack ----------------- */
     // Seg faults on my machine, some problem with pthreads, but you get the point
-    /*lapack_int ipiv[n];
-    info = LAPACKE_sgetri( LAPACK_ROW_MAJOR,n,&c[0],n,ipiv );
+    lapack_int ipiv[n];
+    LAPACK_sgetrf(&n,&n,&c[0],&n,ipiv,&info);
     // Error checking
     if (info > 0)
     {
         std::cout << "Inversion failed! Error code: " << info << std::endl;
         exit(EXIT_FAILURE);
-    }*/
+    }
+
+    info = LAPACKE_sgetri( n,n,&c[0],n,ipiv );
+    // Error checking
+    if (info > 0)
+    {
+        std::cout << "Inversion failed! Error code: " << info << std::endl;
+        exit(EXIT_FAILURE);
+    }
     /* ----------------------------------------------------------------- */
 
     /* -------------------- Matrix Mult with cBlas ----------------- */
 
-    cblas_sgemm(CblasRowMajor,CblasTrans,CblasNoTrans,n,n,1,1.0f,&a[0],n,&a[0],n,0.0f,&c[0],n);
+    std::vector<float> b(n*n);
+    cblas_sgemm(CblasRowMajor,CblasTrans,CblasNoTrans,n,n,1,1.0f,&a[0],n,&c[0],n,0.0f,&b[0],n);
     //cblas_sgemm(CblasRowMajor,CblasNoTrans,CblasNoTrans,n,n,1,1.0f,&c[0],n,&a[0],n,0.0f,&b[0],n);
 
     /* -------------------------------------------------------------- */
@@ -93,10 +103,11 @@ int main (int argc,char* argv[])
     {
         for (int j=0;j<n;++j)
         {
-            std::cout << c[i*n+j] << " ";
+            std::cout << b[i*n+j] << " ";
         }
         std::cout << std::endl;
     }
+
 
     return 0;
 }
